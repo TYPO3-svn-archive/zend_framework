@@ -18,7 +18,7 @@
  * @subpackage Zend_OpenId_Consumer
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Consumer.php 10121 2008-07-16 09:12:52Z dmitry $
+ * @version    $Id: Consumer.php 12193 2008-10-30 12:50:13Z dmitry $
  */
 
 /**
@@ -94,7 +94,7 @@ class Zend_OpenId_Consumer
      *
      * @var string $_error
      */
-    private $_erro = '';
+    private $_error = '';
 
     /**
      * Constructs a Zend_OpenId_Consumer object with given $storage.
@@ -215,6 +215,10 @@ class Zend_OpenId_Consumer
             }
         }
 
+        if (empty($params['openid_mode'])) {
+            $this->_setError("Missing openid.mode");
+            return false;
+        }
         if (empty($params['openid_return_to'])) {
             $this->_setError("Missing openid.return_to");
             return false;
@@ -225,10 +229,6 @@ class Zend_OpenId_Consumer
         }
         if (empty($params['openid_sig'])) {
             $this->_setError("Missing openid.sig");
-            return false;
-        }
-        if (empty($params['openid_mode'])) {
-            $this->_setError("Missing openid.mode");
             return false;
         }
         if ($params['openid_mode'] != 'id_res') {
@@ -300,12 +300,12 @@ class Zend_OpenId_Consumer
                     $id = $params['openid_claimed_id'];
                     if (!Zend_OpenId::normalize($id) ||
                         !$this->_discovery($id, $discovered_server, $discovered_version) ||
-                        (isset($params['openid_identity']) &&
+                        (!empty($params['openid_identity']) &&
                          $params["openid_identity"] != $id) ||
-                        (isset($params['openid_op_endpoint']) &&
+                        (!empty($params['openid_op_endpoint']) &&
                          $params['openid_op_endpoint'] != $discovered_server) ||
                         $discovered_version != $version) {
-                        $this->_setError("Dscovery information verification failed");
+                        $this->_setError("Discovery information verification failed");
                         return false;
                     }
                 }
@@ -329,7 +329,7 @@ class Zend_OpenId_Consumer
 
             if (!Zend_OpenId::normalize($id) ||
                 !$this->_discovery($id, $server, $discovered_version)) {
-                $this->_setError("Dscovery failed");
+                $this->_setError("Discovery failed");
                 return false;
             }
 
@@ -339,7 +339,7 @@ class Zend_OpenId_Consumer
                 (isset($params['openid_op_endpoint']) &&
                  $params['openid_op_endpoint'] != $server) ||
                 $discovered_version != $version) {
-                $this->_setError("Dscovery information verification failed");
+                $this->_setError("Discovery information verification failed");
                 return false;
             }
 
@@ -357,7 +357,6 @@ class Zend_OpenId_Consumer
             $params2['openid.mode'] = 'check_authentication';
             $ret = $this->_httpRequest($server, 'POST', $params2, $status);
             if ($status != 200) {
-                $this->_setError("'Dumb' signature verification HTTP request failed");
                 return false;
             }
             $r = array();
@@ -489,6 +488,7 @@ class Zend_OpenId_Consumer
         try {
             $response = $client->request();
         } catch (Exception $e) {
+            $this->_setError('HTTP Request failed: ' . $e->getMessage());
             return false;
         }
         $status = $response->getStatus();
@@ -496,6 +496,7 @@ class Zend_OpenId_Consumer
         if ($status == 200 || ($status == 400 && !empty($body))) {
             return $body;
         }else{
+            $this->_setError('Bad HTTP response');
             return false;
         }
     }

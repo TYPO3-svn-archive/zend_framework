@@ -25,11 +25,6 @@
 require_once 'Zend/Controller/Action/Helper/Abstract.php';
 
 /**
- * @see Zend_View_Interface
- */
-require_once 'Zend/View/Interface.php';
-
-/**
  * @see Zend_View
  */
 require_once 'Zend/View.php';
@@ -223,20 +218,6 @@ class Zend_Controller_Action_Helper_ViewRenderer extends Zend_Controller_Action_
     {
         $this->view = $view;
         return $this;
-    }
-
-    /**
-     * Retrieve front controller instance
-     *
-     * @return Zend_Controller_Front
-     */
-    public function getFrontController()
-    {
-        if (null === $this->_frontController) {
-            $this->_frontController = Zend_Controller_Front::getInstance();
-        }
-
-        return $this->_frontController;
     }
 
     /**
@@ -885,7 +866,7 @@ class Zend_Controller_Action_Helper_ViewRenderer extends Zend_Controller_Action_
             $origSuffix = $this->getViewSuffix();
             $this->setViewSuffix($params['suffix']);
         }
-        if (isset($moduleDir)) {
+        if (isset($params['moduleDir'])) {
             $origModuleDir = $this->_getModuleDir();
             $this->_setModuleDir($params['moduleDir']);
         }
@@ -895,7 +876,7 @@ class Zend_Controller_Action_Helper_ViewRenderer extends Zend_Controller_Action_
         if (isset($params['suffix'])) {
             $this->setViewSuffix($origSuffix);
         }
-        if (isset($moduleDir)) {
+        if (isset($params['moduleDir'])) {
             $this->_setModuleDir($origModuleDir);
         }
 

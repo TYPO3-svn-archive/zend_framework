@@ -38,3 +38,5 @@ function zend_framework_autoload($class) {
 		require_once($path);
 	}
 }
+
+?>

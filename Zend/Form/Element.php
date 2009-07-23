@@ -32,7 +32,7 @@ require_once 'Zend/Validate/Interface.php';
  * @subpackage Element
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Element.php 10676 2008-08-05 14:54:03Z matthew $
+ * @version    $Id: Element.php 12328 2008-11-06 16:49:03Z matthew $
  */
 class Zend_Form_Element implements Zend_Validate_Interface
 {
@@ -287,6 +287,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
         if (empty($decorators)) {
             $this->addDecorator('ViewHelper')
                 ->addDecorator('Errors')
+                ->addDecorator('Description', array('tag' => 'p', 'class' => 'description'))
                 ->addDecorator('HtmlTag', array('tag' => 'dd'))
                 ->addDecorator('Label', array('tag' => 'dt'));
         }
@@ -303,6 +304,11 @@ class Zend_Form_Element implements Zend_Validate_Interface
         if (isset($options['prefixPath'])) {
             $this->addPrefixPaths($options['prefixPath']);
             unset($options['prefixPath']);
+        }
+
+        if (isset($options['disableTranslator'])) {
+            $this->setDisableTranslator($options['disableTranslator']);
+            unset($options['disableTranslator']);
         }
 
         unset($options['options']);
@@ -760,7 +766,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
     }
 
     /**
-     * Return elment type
+     * Return element type
      * 
      * @return string
      */
@@ -878,6 +884,37 @@ class Zend_Form_Element implements Zend_Validate_Interface
     public function __set($key, $value)
     {
         $this->setAttrib($key, $value);
+    }
+
+    /**
+     * Overloading: allow rendering specific decorators
+     *
+     * Call renderDecoratorName() to render a specific decorator.
+     * 
+     * @param  string $method 
+     * @param  array $args 
+     * @return string
+     * @throws Zend_Form_Exception for invalid decorator or invalid method call
+     */
+    public function __call($method, $args)
+    {
+        if ('render' == substr($method, 0, 6)) {
+            $decoratorName = substr($method, 6);
+            if (false !== ($decorator = $this->getDecorator($decoratorName))) {
+                $decorator->setElement($this);
+                $seed = '';
+                if (0 < count($args)) {
+                    $seed = array_shift($args);
+                }
+                return $decorator->render($seed);
+            }
+
+            require_once 'Zend/Form/Element/Exception.php';
+            throw new Zend_Form_Element_Exception(sprintf('Decorator by name %s does not exist', $decoratorName));
+        }
+
+        require_once 'Zend/Form/Element/Exception.php';
+        throw new Zend_Form_Element_Exception(sprintf('Method %s does not exist', $method));
     }
 
     // Loaders

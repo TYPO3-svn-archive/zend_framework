@@ -61,7 +61,7 @@ class Zend_Wildfire_Plugin_FirePhp_Message
      * @var boolean
      */
     protected $_destroy = false;
-
+    
     /**
      * Random unique ID used to identify message in comparison operations
      * @var string
@@ -71,14 +71,14 @@ class Zend_Wildfire_Plugin_FirePhp_Message
     /**
      * Creates a new message with the given style and message
      * 
-     * @return 
      * @param string $style Style of the message.
      * @param mixed $message The message
+     * @return void
      */
     function __construct($style, $message)
     {
         $this->_style = $style;
-        $this->_message = $message;    
+        $this->_message = $message;
         $this->_ruid = md5(microtime().mt_rand());
     }
     
