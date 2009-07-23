@@ -691,7 +691,7 @@ class Zend_Console_Getopt
             }
             if (substr($argv[0], 0, 2) == '--') {
                 $this->_parseLongOption($argv);
-            } else if (substr($argv[0], 0, 1) == '-') {
+            } else if (substr($argv[0], 0, 1) == '-' && ('-' != $argv[0] || count($argv) >1))  {
                 $this->_parseShortOptionCluster($argv);
             } else {
                 $this->_remainingArgs[] = array_shift($argv);
@@ -712,7 +712,7 @@ class Zend_Console_Getopt
     protected function _parseLongOption(&$argv)
     {
         $optionWithParam = ltrim(array_shift($argv), '-');
-        $l = explode('=', $optionWithParam);
+        $l = explode('=', $optionWithParam, 2);
         $flag = array_shift($l);
         $param = array_shift($l);
         if (isset($param)) {

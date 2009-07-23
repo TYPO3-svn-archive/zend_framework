@@ -1,14 +1,42 @@
+09-03-14 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.6 Minimal.
+	
+09-02-17 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.5 Minimal.
+	
+09-02-02 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.4 Minimal.
+
+09-01-21 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.3 Minimal.
+
+09-01-14 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Added two options "Add include path" and "Register autoloader". Marked extension as stable.
+
+09-01-10 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.2 Minimal.
+
+08-12-03 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.7.1 Minimal.
+
 08-11-25 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
-	* Zend Framework 1.7.0 Minimal. See issue tracker for details under http://framework.zend.com/issues/secure/IssueNavigator.jspa?requestId=10903
+	* Zend Framework 1.7.0 Minimal.
 
 08-10-15 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
-	* Zend Framework 1.6.2 Minimal. See issue tracker for details under http://framework.zend.com/issues/browse/ZF/fixforversion/10251
+	* Zend Framework 1.6.2 Minimal.
 
 08-09-22 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
-	* Zend Framework 1.6.1 Minimal. See Zend Framework issue tracker for details under http://framework.zend.com/issues/secure/IssueNavigator.jspa?requestId=10852. Added the closing php-tag in ext_localconf.php because of caching error.
+	* Zend Framework 1.6.1 Minimal.
 
 08-09-05 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 

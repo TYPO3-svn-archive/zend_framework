@@ -94,7 +94,8 @@ abstract class Zend_Translate_Adapter {
     {
         if (isset(self::$_cache)) {
             $id = 'Zend_Translate_' . $this->toString() . '_Options';
-            if ($result = self::$_cache->load($id)) {
+            $result = self::$_cache->load($id);
+            if ($result) {
                 $this->_options   = unserialize($result);
             }
         }
@@ -125,12 +126,19 @@ abstract class Zend_Translate_Adapter {
      */
     public function addTranslation($data, $locale = null, array $options = array())
     {
-        $locale    = $this->_getRegistryLocale($locale);
+        try {
+            $locale    = Zend_Locale::findLocale($locale);
+        } catch (Zend_Locale_Exception $e) {
+            require_once 'Zend/Translate/Exception.php';
+            throw new Zend_Translate_Exception("The given Language '{$locale}' does not exist");
+        }
+
         $originate = (string) $locale;
 
         $this->setOptions($options);
         if (is_string($data) and is_dir($data)) {
-            $prev  = '';
+            $data = realpath($data);
+            $prev = '';
             foreach (new RecursiveIteratorIterator(
                      new RecursiveDirectoryIterator($data, RecursiveDirectoryIterator::KEY_AS_PATHNAME),
                      RecursiveIteratorIterator::SELF_FIRST) as $directory => $info) {
@@ -157,7 +165,7 @@ abstract class Zend_Translate_Adapter {
                         if (Zend_Locale::isLocale((string) $filename, true, false)) {
                             $locale = (string) $filename;
                         } else {
-                            $parts  = explode('.', $filename);
+                            $parts  = explode('.', $file);
                             $parts2 = array();
                             foreach($parts as $token) {
                                 $parts2 += explode('_', $token);
@@ -213,15 +221,18 @@ abstract class Zend_Translate_Adapter {
      */
     public function setOptions(array $options = array())
     {
+        $change = false;
         foreach ($options as $key => $option) {
             if ($key == "locale") {
                 $this->setLocale($option);
-            } else {
+            } else if ((isset($this->_options[$key]) and ($this->_options[$key] != $option)) or
+                    !isset($this->_options[$key])) {
                 $this->_options[$key] = $option;
+                $change = true;
             }
         }
 
-        if (isset(self::$_cache)) {
+        if (isset(self::$_cache) and ($change == true)) {
             $id = 'Zend_Translate_' . $this->toString() . '_Options';
             self::$_cache->save( serialize($this->_options), $id);
         }
@@ -241,10 +252,11 @@ abstract class Zend_Translate_Adapter {
         if ($optionKey === null) {
             return $this->_options;
         }
-        $optionKey = strtolower($optionKey);
+
         if (isset($this->_options[$optionKey]) === true) {
             return $this->_options[$optionKey];
         }
+
         return null;
     }
 
@@ -267,26 +279,19 @@ abstract class Zend_Translate_Adapter {
      */
     public function setLocale($locale)
     {
-        $locale = $this->_getRegistryLocale($locale);
         if (($locale === "auto") or ($locale === null)) {
             $this->_automatic = true;
         } else {
             $this->_automatic = false;
         }
 
-        if (!Zend_Locale::isLocale($locale, true, false)) {
-            if (!Zend_Locale::isLocale($locale, false, false)) {
-                /**
-                 * @see Zend_Translate_Exception
-                 */
-                require_once 'Zend/Translate/Exception.php';
-                throw new Zend_Translate_Exception("The given Language ({$locale }) does not exist");
-            }
-
-            $locale = new Zend_Locale($locale);
+        try {
+            $locale = Zend_Locale::findLocale($locale);
+        } catch (Zend_Locale_Exception $e) {
+            require_once 'Zend/Translate/Exception.php';
+            throw new Zend_Translate_Exception("The given Language ({$locale}) does not exist");
         }
 
-        $locale = (string) $locale;
         if (!isset($this->_translate[$locale])) {
             $temp = explode('_', $locale);
             if (!isset($this->_translate[$temp[0]]) and !isset($this->_translate[$locale])) {
@@ -308,11 +313,13 @@ abstract class Zend_Translate_Adapter {
             }
         }
 
-        $this->_options['locale'] = $locale;
+        if ($this->_options['locale'] != $locale) {
+            $this->_options['locale'] = $locale;
 
-        if (isset(self::$_cache)) {
-            $id = 'Zend_Translate_' . $this->toString() . '_Options';
-            self::$_cache->save( serialize($this->_options), $id);
+            if (isset(self::$_cache)) {
+                $id = 'Zend_Translate_' . $this->toString() . '_Options';
+                self::$_cache->save( serialize($this->_options), $id);
+            }
         }
 
         return $this;
@@ -413,18 +420,13 @@ abstract class Zend_Translate_Adapter {
      */
     private function _addTranslationData($data, $locale, array $options = array())
     {
-        if (!Zend_Locale::isLocale($locale, true, false)) {
-            if (!Zend_Locale::isLocale($locale, false, false)) {
-                /**
-                 * @see Zend_Translate_Exception
-                 */
-                require_once 'Zend/Translate/Exception.php';
-                throw new Zend_Translate_Exception("The given Language ({$locale}) does not exist");
-            }
-            $locale = new Zend_Locale($locale);
+        try {
+            $locale    = Zend_Locale::findLocale($locale);
+        } catch (Zend_Locale_Exception $e) {
+            require_once 'Zend/Translate/Exception.php';
+            throw new Zend_Translate_Exception("The given Language '{$locale}' does not exist");
         }
 
-        $locale = (string) $locale;
         if (isset($this->_translate[$locale]) === false) {
             $this->_translate[$locale] = array();
         }
@@ -432,7 +434,8 @@ abstract class Zend_Translate_Adapter {
         $read = true;
         if (isset(self::$_cache)) {
             $id = 'Zend_Translate_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $data) . '_' . $locale . '_' . $this->toString();
-            if ($result = self::$_cache->load($id)) {
+            $result = self::$_cache->load($id);
+            if ($result) {
                 $this->_translate[$locale] = unserialize($result);
                 $read = false;
             }
@@ -619,28 +622,6 @@ abstract class Zend_Translate_Adapter {
     public static function clearCache()
     {
         self::$_cache->clean();
-    }
-
-    /**
-     * Evaluates the locale from registry or auto
-     *
-     * @param  string|Zend_Locale $locale
-     * @return string
-     */
-    private function _getRegistryLocale($locale)
-    {
-        if (empty($locale)) {
-            require_once 'Zend/Registry.php';
-            if (Zend_Registry::isRegistered('Zend_Locale') === true) {
-                $locale = Zend_Registry::get('Zend_Locale');
-            }
-        }
-
-        if ($locale === null) {
-            $locale = new Zend_Locale();
-        }
-
-        return $locale;
     }
 
     /**

@@ -16,7 +16,7 @@
  * @category   Zend
  * @package    Zend_Gdata
  * @subpackage YouTube
- * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
@@ -61,12 +61,18 @@ require_once 'Zend/Gdata/YouTube/ContactFeed.php';
 require_once 'Zend/Gdata/YouTube/PlaylistVideoFeed.php';
 
 /**
+ * @see Zend_Gdata_YouTube_ActivityFeed
+ */
+require_once 'Zend/Gdata/YouTube/ActivityFeed.php';
+
+/**
  * Service class for interacting with the YouTube Data API.
  * @link http://code.google.com/apis/youtube/
  *
  * @category   Zend
  * @package    Zend_Gdata
- * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
+ * @subpackage YouTube
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_Gdata_YouTube extends Zend_Gdata_Media
@@ -80,6 +86,15 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
     const STANDARD_RECENTLY_FEATURED_URI = 'http://gdata.youtube.com/feeds/standardfeeds/recently_featured';
     const STANDARD_WATCH_ON_MOBILE_URI = 'http://gdata.youtube.com/feeds/standardfeeds/watch_on_mobile';
 
+    const STANDARD_TOP_RATED_URI_V2 =
+        'http://gdata.youtube.com/feeds/api/standardfeeds/top_rated';
+    const STANDARD_MOST_VIEWED_URI_V2 =
+        'http://gdata.youtube.com/feeds/api/standardfeeds/most_viewed';
+    const STANDARD_RECENTLY_FEATURED_URI_V2 =
+        'http://gdata.youtube.com/feeds/api/standardfeeds/recently_featured';
+    const STANDARD_WATCH_ON_MOBILE_URI_V2 =
+        'http://gdata.youtube.com/feeds/api/standardfeeds/watch_on_mobile';
+
     const USER_URI = 'http://gdata.youtube.com/feeds/api/users';
     const VIDEO_URI = 'http://gdata.youtube.com/feeds/api/videos';
     const PLAYLIST_REL = 'http://gdata.youtube.com/schemas/2007#playlist';
@@ -91,18 +106,34 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
     const VIDEO_RESPONSES_REL = 'http://gdata.youtube.com/schemas/2007#video.responses';
     const VIDEO_RATINGS_REL = 'http://gdata.youtube.com/schemas/2007#video.ratings';
     const VIDEO_COMPLAINTS_REL = 'http://gdata.youtube.com/schemas/2007#video.complaints';
+    const ACTIVITY_FEED_URI = 'http://gdata.youtube.com/feeds/api/events';
+    const FRIEND_ACTIVITY_FEED_URI =
+        'http://gdata.youtube.com/feeds/api/users/default/friendsactivity';
+
+    /**
+     * The maximum number of users for which activity can be requested for,
+     * as enforced by the API.
+     *
+     * @var integer
+     */
+    const ACTIVITY_FEED_MAX_USERS = 20;
 
     const FAVORITES_URI_SUFFIX = 'favorites';
     const UPLOADS_URI_SUFFIX = 'uploads';
     const RESPONSES_URI_SUFFIX = 'responses';
     const RELATED_URI_SUFFIX = 'related';
 
+    /**
+     * Namespaces used for Zend_Gdata_YouTube
+     *
+     * @var array
+     */
     public static $namespaces = array(
-            'yt' => 'http://gdata.youtube.com/schemas/2007',
-            'georss' => 'http://www.georss.org/georss',
-            'gml' => 'http://www.opengis.net/gml',
-            'media' => 'http://search.yahoo.com/mrss/',
-            'app' => 'http://purl.org/atom/app#');
+        array('yt', 'http://gdata.youtube.com/schemas/2007', 1, 0),
+        array('georss', 'http://www.georss.org/georss', 1, 0),
+        array('gml', 'http://www.opengis.net/gml', 1, 0),
+        array('media', 'http://search.yahoo.com/mrss/', 1, 0)
+    );
 
     /**
      * Create Zend_Gdata_YouTube object
@@ -292,8 +323,14 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
      */
     public function getTopRatedVideoFeed($location = null)
     {
+        $standardFeedUri = self::STANDARD_TOP_RATED_URI;
+
+        if ($this->getMajorProtocolVersion() == 2) {
+            $standardFeedUri = self::STANDARD_TOP_RATED_URI_V2;
+        }
+
         if ($location == null) {
-            $uri = self::STANDARD_TOP_RATED_URI;
+            $uri = $standardFeedUri;
         } else if ($location instanceof Zend_Gdata_Query) {
             if ($location instanceof Zend_Gdata_YouTube_VideoQuery) {
                 if (!isset($location->url)) {
@@ -318,8 +355,14 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
      */
     public function getMostViewedVideoFeed($location = null)
     {
+        $standardFeedUri = self::STANDARD_MOST_VIEWED_URI;
+
+        if ($this->getMajorProtocolVersion() == 2) {
+            $standardFeedUri = self::STANDARD_MOST_VIEWED_URI_V2;
+        }
+
         if ($location == null) {
-            $uri = self::STANDARD_MOST_VIEWED_URI;
+            $uri = $standardFeedUri;
         } else if ($location instanceof Zend_Gdata_Query) {
             if ($location instanceof Zend_Gdata_YouTube_VideoQuery) {
                 if (!isset($location->url)) {
@@ -343,8 +386,14 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
      */
     public function getRecentlyFeaturedVideoFeed($location = null)
     {
+        $standardFeedUri = self::STANDARD_RECENTLY_FEATURED_URI;
+
+        if ($this->getMajorProtocolVersion() == 2) {
+            $standardFeedUri = self::STANDARD_RECENTLY_FEATURED_URI_V2;
+        }
+
         if ($location == null) {
-            $uri = self::STANDARD_RECENTLY_FEATURED_URI;
+            $uri = $standardFeedUri;
         } else if ($location instanceof Zend_Gdata_Query) {
             if ($location instanceof Zend_Gdata_YouTube_VideoQuery) {
                 if (!isset($location->url)) {
@@ -369,8 +418,14 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
      */
     public function getWatchOnMobileVideoFeed($location = null)
     {
+        $standardFeedUri = self::STANDARD_WATCH_ON_MOBILE_URI;
+
+        if ($this->getMajorProtocolVersion() == 2) {
+            $standardFeedUri = self::STANDARD_WATCH_ON_MOBILE_URI_V2;
+        }
+
         if ($location == null) {
-            $uri = self::STANDARD_WATCH_ON_MOBILE_URI;
+            $uri = $standardFeedUri;
         } else if ($location instanceof Zend_Gdata_Query) {
             if ($location instanceof Zend_Gdata_YouTube_VideoQuery) {
                 if (!isset($location->url)) {
@@ -541,8 +596,9 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
 
         if (!$success) {
             require_once 'Zend/Gdata/App/Exception.php';
-            throw new Zend_Gdata_App_Exception("Zend_Gdata_YouTube::parseFormUploadTokenResponse - " .
-                                               "DOMDocument cannot parse XML: $php_errormsg");
+            throw new Zend_Gdata_App_Exception(
+                "Zend_Gdata_YouTube::parseFormUploadTokenResponse - " .
+                "DOMDocument cannot parse XML: $php_errormsg");
         }
         $responseElement = $doc->getElementsByTagName('response')->item(0);
 
@@ -587,4 +643,57 @@ class Zend_Gdata_YouTube extends Zend_Gdata_Media
             throw new Zend_Gdata_App_Exception('Url must be provided as a string URL');
         }
     }
+
+    /**
+     * Retrieves the activity feed for users
+     *
+     * @param mixed $usernames A string identifying the usernames for which to
+     *              retrieve activity for. This can also be a Zend_Gdata_Query
+     *              object from which a URL can be determined.
+     * @throws Zend_Gdata_App_VersionException if using version less than 2.
+     * @return Zend_Gdata_YouTube_ActivityFeed
+     */
+    public function getActivityForUser($username)
+    {
+        if ($this->getMajorProtocolVersion() == 1) {
+            require_once 'Zend/Gdata/App/VersionException.php';
+            throw new Zend_Gdata_App_VersionException('User activity feeds ' .
+                'are not available in API version 1.');
+        }
+
+        $uri = null;
+        if ($username instanceof Zend_Gdata_Query) {
+            $uri = $username->getQueryUrl();
+        } else {
+            if (count(explode(',', $username)) >
+                self::ACTIVITY_FEED_MAX_USERS) {
+                require_once 'Zend/Gdata/App/InvalidArgumentException.php';
+                throw new Zend_Gdata_App_InvalidArgumentException(
+                    'Activity feed can only retrieve for activity for up to ' .
+                    self::ACTIVITY_FEED_MAX_USERS .  ' users per request');
+            }
+            $uri = self::ACTIVITY_FEED_URI . '?author=' . $username;
+        }
+
+        return parent::getFeed($uri, 'Zend_Gdata_YouTube_ActivityFeed');
+    }
+
+    /**
+     * Retrieve the activity of the currently authenticated users friend.
+     *
+     * @throws Zend_Gdata_App_Exception if not logged in.
+     * @return Zend_Gdata_YouTube_ActivityFeed
+     */
+    public function getFriendActivityForCurrentUser()
+    {
+        if (!$this->isAuthenticated()) {
+            require_once 'Zend/Gdata/YouTube/App/Exception.php';
+            throw new Zend_Gdata_App_Exception('You must be authenticated to ' .
+                'use the getFriendActivityForCurrentUser function in Zend_' .
+                'Gdata_YouTube.');
+        }
+        return parent::getFeed(self::FRIEND_ACTIVITY_FEED_URI,
+            'Zend_Gdata_YouTube_ActivityFeed');
+    }
+
 }
