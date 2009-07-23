@@ -5,6 +5,7 @@
 	* Cleanup: Removed fixed inclusion of Zend Framework
 	* Cleanup: Defined external source for directory Zend
 	* Upgrade: Zend Framework 1.8.4
+	* Cleanup: Added license information of Zend Framework
 
 2009-03-14  Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
