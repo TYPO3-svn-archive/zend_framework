@@ -18,7 +18,7 @@
  * @subpackage Zend_OpenId_Consumer
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Consumer.php 10122 2008-07-16 09:15:27Z dmitry $
+ * @version    $Id: Consumer.php 10121 2008-07-16 09:12:52Z dmitry $
  */
 
 /**

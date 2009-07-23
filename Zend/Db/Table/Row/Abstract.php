@@ -671,12 +671,12 @@ abstract class Zend_Db_Table_Row_Abstract
 
         // retrieve recently updated row using primary keys
         $where = array();
-        foreach ($primaryKey as $columnName => $value) {
-            $column = $db->quoteIdentifier($columnName, true);
-            $type = $metadata[$columnName]['DATA_TYPE'];
-            $where[] = $db->quoteInto("$column = ?", $value, $type);
+        foreach ($primaryKey as $column => $value) {
+            $tableName = $db->quoteIdentifier($info[Zend_Db_Table_Abstract::NAME]);
+            $type = $metadata[$column]['DATA_TYPE'];
+            $columnName = $db->quoteIdentifier($column, true);
+            $where[] = $db->quoteInto("{$tableName}.{$columnName} = ?", $value, $type);
         }
-
         return $where;
     }
 
@@ -790,6 +790,7 @@ abstract class Zend_Db_Table_Row_Abstract
      *
      * @param string|Zend_Db_Table_Abstract  $dependentTable
      * @param string                         OPTIONAL $ruleKey
+     * @param Zend_Db_Table_Select           OPTIONAL $select
      * @return Zend_Db_Table_Rowset_Abstract Query result from $dependentTable
      * @throws Zend_Db_Table_Row_Exception If $dependentTable is not a table or is not loadable.
      */
@@ -973,6 +974,7 @@ abstract class Zend_Db_Table_Row_Abstract
             $value = $this->_data[$callerColumnName];
             $interColumnName = $interDb->foldCase($callerMap[Zend_Db_Table_Abstract::COLUMNS][$i]);
             $interCol = $interDb->quoteIdentifier("i.$interColumnName", true);
+            $matchColumnName = $interDb->foldCase($matchMap[Zend_Db_Table_Abstract::REF_COLUMNS][$i]);
             $interInfo = $intersectionTable->info();
             $type = $interInfo[Zend_Db_Table_Abstract::METADATA][$interColumnName]['DATA_TYPE'];
             $select->where($interDb->quoteInto("$interCol = ?", $value, $type));

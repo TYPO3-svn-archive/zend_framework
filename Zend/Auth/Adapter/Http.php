@@ -17,7 +17,7 @@
  * @subpackage Zend_Auth_Adapter_Http
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Http.php 10489 2008-07-26 21:49:54Z alexander $
+ * @version    $Id: Http.php 9404 2008-05-07 23:42:02Z doctorrock83 $
  */
 
 

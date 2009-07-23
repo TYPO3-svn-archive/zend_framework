@@ -16,7 +16,7 @@
  * @package    Zend_Session
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Namespace.php 9665 2008-06-11 07:39:26Z stas $
+ * @version    $Id: Namespace.php 11004 2008-08-24 14:44:07Z matthew $
  * @since      Preview Release 0.2
  */
 
@@ -244,7 +244,7 @@ class Zend_Session_Namespace extends Zend_Session_Abstract implements IteratorAg
      * @param string $name - programmatic name of a key, in a <key,value> pair in the current namespace
      * @return mixed
      */
-    protected function & __get($name)
+    public function & __get($name)
     {
         if ($name === '') {
             /**

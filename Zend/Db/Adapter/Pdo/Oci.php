@@ -17,7 +17,7 @@
  * @subpackage Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Oci.php 9538 2008-05-26 22:09:08Z peptolab $
+ * @version    $Id: Oci.php 9537 2008-05-26 22:06:54Z peptolab $
  */
 
 

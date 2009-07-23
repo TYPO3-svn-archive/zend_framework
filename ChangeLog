@@ -1,3 +1,7 @@
+08-09-05 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
+
+	* Zend Framework 1.6.0 Minimal
+	
 08-09-02 Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
 	* Added german documentation. Changed version number to the same like Zend Framework, optimized adding include path

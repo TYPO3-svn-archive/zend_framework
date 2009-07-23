@@ -88,7 +88,8 @@ class Zend_Controller_Action_Helper_Redirector extends Zend_Controller_Action_He
      */
     protected function _checkCode($code)
     {
-        if (!is_int($code) || (300 > $code) || (307 < $code)) {
+        $code = (int)$code;
+        if ((300 > $code) || (307 < $code)) {
             /**
              * @see Zend_Controller_Exception
              */
@@ -246,44 +247,34 @@ class Zend_Controller_Action_Helper_Redirector extends Zend_Controller_Action_He
     {
         $dispatcher = Zend_Controller_Front::getInstance()->getDispatcher();
         $request    = $this->getRequest();
+        $curModule  = $request->getModuleName();
+        $useDefaultController = false;
 
-        if (null === $module) {
-            $module = $request->getModuleName();
-            if ($module == $dispatcher->getDefaultModule()) {
-                $module = '';
-            }
+        if (null === $controller && null !== $module) {
+            $useDefaultController = true;
         }
 
-        if (null === $controller) {
+        if (null === $module) {
+            $module = $curModule;
+        } 
+        
+        if ($module == $dispatcher->getDefaultModule()) {
+            $module = '';
+        }
+
+        if (null === $controller && !$useDefaultController) {
             $controller = $request->getControllerName();
             if (empty($controller)) {
                 $controller = $dispatcher->getDefaultControllerName();
             }
         }
 
-        $paramsNormalized = array();
-        foreach ($params as $key => $value) {
-            $paramsNormalized[] = $key . '/' . $value;
-        }
-        $paramsString = implode('/', $paramsNormalized);
+        $params['module']     = $module;
+        $params['controller'] = $controller;
+        $params['action']     = $action;
 
-        if (!empty($paramsString)) {
-            $url = $module . '/' . $controller . '/' . $action . '/' . $paramsString;
-        } else {
-            if ($action != $dispatcher->getDefaultAction()) {
-                $url = $module . '/' . $controller . '/' . $action;
-            } else {
-                if ($controller != $dispatcher->getDefaultControllerName()) {
-                    $url = $module . '/' . $controller;
-                } else {
-                    $url = $module;
-                }
-            }
-        }
-
-        $url = '/' . trim($url, '/');
-
-        $url = $this->_prependBase($url);
+        $router = $this->getFrontController()->getRouter();
+        $url    = $router->assemble($params, 'default', true);
 
         $this->_redirect($url);
     }
@@ -294,27 +285,13 @@ class Zend_Controller_Action_Helper_Redirector extends Zend_Controller_Action_He
      * @param  array   $urlOptions
      * @param  string  $name Route name
      * @param  boolean $reset
+     * @param  boolean $encode
      * @return void
      */
-    public function setGotoRoute(array $urlOptions = array(), $name = null, $reset = false)
+    public function setGotoRoute(array $urlOptions = array(), $name = null, $reset = false, $encode = true)
     {
-        $router = Zend_Controller_Front::getInstance()->getRouter();
-
-        if (empty($name)) {
-            try {
-                $name = $router->getCurrentRouteName();
-            } catch (Zend_Controller_Router_Exception $e) {
-                if ($router->hasRoute('default')) {
-                    $name = 'default';
-                }
-            }
-        }
-
-        $route   = $router->getRoute($name);
-        $request = $this->getRequest();
-
-        $url  = rtrim($request->getBaseUrl(), '/') . '/';
-        $url .= $route->assemble($urlOptions, $reset);
+        $router = $this->getFrontController()->getRouter();
+        $url    = $router->assemble($urlOptions, $name, $reset, $encode);
 
         $this->_redirect($url);
     }
@@ -413,11 +390,12 @@ class Zend_Controller_Action_Helper_Redirector extends Zend_Controller_Action_He
      * @param  array   $urlOptions Array of key/value pairs used to assemble URL
      * @param  string  $name
      * @param  boolean $reset
+     * @param  boolean $encode
      * @return void
      */
-    public function gotoRoute(array $urlOptions = array(), $name = null, $reset = false)
+    public function gotoRoute(array $urlOptions = array(), $name = null, $reset = false, $encode = true)
     {
-        $this->setGotoRoute($urlOptions, $name, $reset);
+        $this->setGotoRoute($urlOptions, $name, $reset, $encode);
 
         if ($this->getExit()) {
             $this->redirectAndExit();

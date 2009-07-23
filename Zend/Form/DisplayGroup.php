@@ -25,7 +25,7 @@
  * @package    Zend_Form
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: DisplayGroup.php 10405 2008-07-25 15:12:58Z matthew $
+ * @version    $Id: DisplayGroup.php 10406 2008-07-25 15:13:05Z matthew $
  */
 class Zend_Form_DisplayGroup implements Iterator,Countable
 {
@@ -315,6 +315,47 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
     }
 
     /**
+     * Get fully qualified name
+     *
+     * Places name as subitem of array and/or appends brackets.
+     * 
+     * @return string
+     */
+    public function getFullyQualifiedName()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Get element id
+     * 
+     * @return string
+     */
+    public function getId()
+    {
+        if (isset($this->id)) {
+            return $this->id;
+        }
+
+        $id = $this->getFullyQualifiedName();
+
+        // Bail early if no array notation detected
+        if (!strstr($id, '[')) {
+            return $id;
+        }
+
+        // Strip array notation
+        if ('[]' == substr($id, -2)) {
+            $id = substr($id, 0, strlen($id) - 2);
+        }
+        $id = str_replace('][', '-', $id);
+        $id = str_replace(array(']', '['), '-', $id);
+        $id = trim($id, '-');
+
+        return $id;
+    }
+
+    /**
      * Set group legend
      * 
      * @param  string $legend 
@@ -598,7 +639,7 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
      * @param  null|array $options 
      * @return Zend_Form_Decorator_Interface
      */
-    protected function _getDecorator($name, $options)
+    protected function _getDecorator($name, $options = null)
     {
         $class = $this->getPluginLoader()->load($name);
         if (null === $options) {
@@ -623,8 +664,11 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
         if ($decorator instanceof Zend_Form_Decorator_Interface) {
             $name = get_class($decorator);
         } elseif (is_string($decorator)) {
-            $decorator = $this->_getDecorator($decorator, $options);
-            $name = get_class($decorator);
+            $name      = $decorator;
+            $decorator = array(
+                'decorator' => $name,
+                'options'   => $options,
+            );
         } elseif (is_array($decorator)) {
             foreach ($decorator as $name => $spec) {
                 break;
@@ -634,7 +678,10 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
                 throw new Zend_Form_Exception('Invalid alias provided to addDecorator; must be alphanumeric string');
             }
             if (is_string($spec)) {
-                $decorator = $this->_getDecorator($spec, $options);
+                $decorator = array(
+                    'decorator' => $spec,
+                    'options'   => $options,
+                );
             } elseif ($spec instanceof Zend_Form_Decorator_Interface) {
                 $decorator = $spec;
             }
@@ -713,17 +760,24 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
     public function getDecorator($name)
     {
         if (!isset($this->_decorators[$name])) {
-            $decorators = array_keys($this->_decorators);
             $len = strlen($name);
-            foreach ($decorators as $decorator) {
-                if ($len > strlen($decorator)) {
+            foreach ($this->_decorators as $localName => $decorator) {
+                if ($len > strlen($localName)) {
                     continue;
                 }
-                if (0 === substr_compare($decorator, $name, -$len, $len, true)) {
-                    return $this->_decorators[$decorator];
+
+                if (0 === substr_compare($localName, $name, -$len, $len, true)) {
+                    if (is_array($decorator)) {
+                        return $this->_loadDecorator($decorator, $localName);
+                    }
+                    return $decorator;
                 }
             }
             return false;
+        }
+
+        if (is_array($this->_decorators[$name])) {
+            return $this->_loadDecorator($this->_decorators[$name], $name);
         }
 
         return $this->_decorators[$name];
@@ -736,6 +790,11 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
      */
     public function getDecorators()
     {
+        foreach ($this->_decorators as $key => $value) {
+            if (is_array($value)) {
+                $this->_loadDecorator($value, $key);
+            }
+        }
         return $this->_decorators;
     }
 
@@ -995,5 +1054,43 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
             $this->_elementOrder = $items;
             $this->_groupUpdated = false;
         }
+    }
+
+    /**
+     * Lazy-load a decorator
+     * 
+     * @param  array $decorator Decorator type and options
+     * @param  mixed $name Decorator name or alias
+     * @return Zend_Form_Decorator_Interface
+     */
+    protected function _loadDecorator(array $decorator, $name)
+    {
+        $sameName = false;
+        if ($name == $decorator['decorator']) {
+            $sameName = true;
+        }
+
+        $instance = $this->_getDecorator($decorator['decorator'], $decorator['options']);
+        if ($sameName) {
+            $newName            = get_class($instance);
+            $decoratorNames     = array_keys($this->_decorators);
+            $order              = array_flip($decoratorNames);
+            $order[$newName]    = $order[$name];
+            $decoratorsExchange = array();
+            unset($order[$name]);
+            asort($order);
+            foreach ($order as $key => $index) {
+                if ($key == $newName) {
+                    $decoratorsExchange[$key] = $instance;
+                    continue;
+                }
+                $decoratorsExchange[$key] = $this->_decorators[$key];
+            }
+            $this->_decorators = $decoratorsExchange;
+        } else {
+            $this->_decorators[$name] = $instance;
+        }
+
+        return $instance;
     }
 }

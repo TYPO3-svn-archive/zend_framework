@@ -38,6 +38,7 @@ class Zend_Translate {
     const AN_ARRAY   = 'array';
     const AN_CSV     = 'csv';
     const AN_GETTEXT = 'gettext';
+    const AN_INI     = 'ini';
     const AN_QT      = 'qt';
     const AN_TBX     = 'tbx';
     const AN_TMX     = 'tmx';
@@ -93,6 +94,9 @@ class Zend_Translate {
             case 'gettext':
                 $adapter = 'Zend_Translate_Adapter_Gettext';
                 break;
+            case 'ini':
+                $adapter = 'Zend_Translate_Adapter_Ini';
+                break;
             case 'qt':
                 $adapter = 'Zend_Translate_Adapter_Qt';
                 break;
@@ -117,7 +121,7 @@ class Zend_Translate {
         $this->_adapter = new $adapter($data, $locale, $options);
         if (!$this->_adapter instanceof Zend_Translate_Adapter) {
             require_once 'Zend/Translate/Exception.php';
-            throw new Zend_Translate_Exception("Adapter " . $adapter . " does not extend Zend_Translate_Adapter");
+            throw new Zend_Translate_Exception("Adapter " . $adapter . " does not extend Zend_Translate_Adapter'");
         }
     }
 

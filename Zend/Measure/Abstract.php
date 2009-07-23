@@ -16,7 +16,7 @@
  * @package   Zend_Measure
  * @copyright Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd     New BSD License
- * @version   $Id: Abstract.php 9811 2008-06-27 20:33:14Z thomas $
+ * @version   $Id: Abstract.php 9795 2008-06-26 20:54:38Z thomas $
  */
 
 require_once 'Zend/Locale.php';

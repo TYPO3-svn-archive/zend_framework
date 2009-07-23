@@ -17,7 +17,7 @@
  * @subpackage Zend_Controller_Action_Helper
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: ContextSwitch.php 10416 2008-07-25 17:00:05Z matthew $
+ * @version    $Id: ContextSwitch.php 11019 2008-08-24 21:40:21Z matthew $
  */
 
 /**
@@ -140,7 +140,7 @@ class Zend_Controller_Action_Helper_ContextSwitch extends Zend_Controller_Action
                 ),
                 'xml'  => array(
                     'suffix'    => 'xml',
-                    'headers'   => array('Content-Type' => 'text/xml'),
+                    'headers'   => array('Content-Type' => 'application/xml'),
                 )
             ));
         }
