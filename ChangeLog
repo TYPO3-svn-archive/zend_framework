@@ -1,11 +1,16 @@
 2009-07-23  Oliver Hader  <oliver@typo3.org>
 
+	* Release of Zend Framework 1.8.4
+
+2009-07-23  Oliver Hader  <oliver@typo3.org>
+
 	* Cleanup: Fixed ChangeLog
 	* Cleanup: Moved extension initialization to separate class tx_zendframework
 	* Cleanup: Removed fixed inclusion of Zend Framework
 	* Cleanup: Defined external source for directory Zend
 	* Cleanup: Added license information of Zend Framework
 	* Cleanup: Set SVN properties on text resources
+	* Cleanup: Updated ext_emconf.php
 	* Upgrade: Zend Framework 1.8.4
 
 2009-03-14  Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
