@@ -2,6 +2,7 @@
 
 	* Cleanup: Fixed ChangeLog
 	* Cleanup: Moved extension initialization to separate class tx_zendframework
+	* Cleanup: Removed fixed inclusion of Zend Framework
 
 2009-03-14  Zephir AG, www.zephir.ch  <thomas.breuss@zephir.ch>
 
