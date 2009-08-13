@@ -28,6 +28,8 @@
 /**
  * Common class for extension zend_framework.
  *
+ * $Id$
+ *
  * @author	Oliver Hader <oliver@typo3.org>
  * @package	TYPO3
  */
