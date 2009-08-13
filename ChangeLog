@@ -1,5 +1,9 @@
 2009-08-13  Oliver Hader  <oliver@typo3.org>
 
+	* Release of Zend Framework 1.9.1
+
+2009-08-13  Oliver Hader  <oliver@typo3.org>
+
 	* Upgrade: Zend Framework 1.9.1
 	* Clenup: Updated ext_emconf.php and initialization class
 
