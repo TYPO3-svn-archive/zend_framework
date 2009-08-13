@@ -63,11 +63,11 @@ class tx_zendframework {
 	 * @return	void
 	 */
 	public static function initialize() {
-		if ($extensionConfiguration) {
-			self::$extensionConfiguration = unserialize(
-				$GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTKEY]
-			);
+		self::$extensionConfiguration = unserialize(
+			$GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTKEY]
+		);
 
+		if (self::$extensionConfiguration) {
 			self::initializeAutoloader();
 			self::initializeIncludePaths();
 		}
@@ -80,7 +80,7 @@ class tx_zendframework {
 	 */
 	public static function initializeAutoloader() {
 		if (self::isEnabled(self::EXTCONF_RegisterAutoload)) {
-			sql_autoload_register('tx_zendframework::autoload');
+			spl_autoload_register('tx_zendframework::autoload');
 		}
 	}
 
